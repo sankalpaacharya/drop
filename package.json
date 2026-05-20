@@ -1,0 +1,26 @@
+{
+	"name": "rsc-framework",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "rspack build",
+		"build:client": "rspack build --config-name client",
+		"build:server": "rspack build --config-name server",
+		"start:server": "node dist/server/main.cjs"
+	},
+	"dependencies": {
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
+		"react-server-dom-rspack": "^0.0.2"
+	},
+	"devDependencies": {
+		"@rspack/cli": "^1.0.0",
+		"@rspack/core": "^1.0.0",
+		"@swc/core": "^1.7.0",
+		"@types/node": "^22.0.0",
+		"@types/react": "^19.0.0",
+		"@types/react-dom": "^19.0.0",
+		"typescript": "^5.5.0"
+	}
+}
