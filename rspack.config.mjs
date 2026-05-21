@@ -1,24 +1,72 @@
-import { experiments } from "@rspack/core";
+// @ts-check
 
-const { createPlugins, Layers } = experiments.rsc;
-const { ServerPlugin, ClientPlugin } = createPlugins();
+/** @type {import('@rspack/core').Configuration} */
 
-export default [
-  {
-    // Client Compiler
-    target: "web",
-    plugins: [new ClientPlugin()],
-    entry: {
-      main: { import: "./src/entry.client.tsx" },
+import { fileURLToPath } from "node:url";
+import path, { resolve } from "node:path";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const swcRule = {
+  test: /\.(?:js|mjs|jsx|ts|tsx)$/,
+  use: {
+    loader: "builtin:swc-loader",
+    options: {
+      detectSyntax: "auto",
+      jsc: {
+        transform: {
+          react: {
+            pragma: "React.createElement",
+            pragmaFrag: "React.Fragment",
+            throwIfNamespace: true,
+            development: false,
+          },
+        },
+      },
     },
-    // ...client-specific config
   },
-  {
-    // Server Compiler
-    target: "node",
-    plugins: [new ServerPlugin()],
+  type: "javascript/auto",
+};
 
-    main: { import: "./src/entry.rsc.tsx" },
-    // ...server-specific config
+const clientConfig = {
+  name: "client",
+  target: "web",
+  mode: "development",
+  entry: {
+    main: "./src/entry.client.tsx",
   },
-];
+  output: {
+    path: path.resolve(__dirname, "dist/client"),
+    filename: "[name].js",
+    clean: true,
+  },
+  module: {
+    rules: [swcRule],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".jsx", ".js"],
+  },
+};
+
+const serverConfig = {
+  name: "server",
+  target: "node",
+  mode: "development",
+  entry: {
+    main: "./src/entry.server.tsx",
+  },
+  output: {
+    path: path.resolve(__dirname, "dist/server"),
+    filename: "[name].cjs",
+    library: { type: "commonjs2" },
+    clean: true,
+  },
+  module: {
+    rules: [swcRule],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".jsx", ".js"],
+  },
+};
+
+export default [clientConfig, serverConfig];
