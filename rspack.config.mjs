@@ -66,6 +66,7 @@ const serverConfig = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js"],
+    conditionNames: ["react-server", "..."],
   },
 };
 
