@@ -53,7 +53,8 @@ const serverConfig = {
   target: "node",
   mode: "development",
   entry: {
-    main: "./src/entry.server.tsx",
+    rsc: { import: "./src/entry.rsc.tsx", layer: "react-server" },
+    ssr: { import: "./src/entry.ssr.tsx", layer: "ssr" },
   },
   output: {
     path: path.resolve(__dirname, "dist/server"),
@@ -62,11 +63,18 @@ const serverConfig = {
     clean: true,
   },
   module: {
-    rules: [swcRule],
+    rules: [
+      swcRule,
+      {
+        issuerLayer: "react-server",
+        resolve: {
+          conditionNames: ["react-server", "..."],
+        },
+      },
+    ],
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js"],
-    conditionNames: ["react-server", "..."],
   },
 };
 
