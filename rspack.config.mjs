@@ -71,6 +71,13 @@ const serverConfig = {
           conditionNames: ["react-server", "..."],
         },
       },
+      {
+        test: /\.(ts|tsx|js|jsx)$/,
+        exclude: /node_modules/,
+        use: [
+          { loader: path.resolve(__dirname, "loaders/use-client-loaders.mjs") },
+        ],
+      },
     ],
   },
   resolve: {
