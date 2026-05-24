@@ -4,9 +4,32 @@
 
 import { fileURLToPath } from "node:url";
 import path, { resolve } from "node:path";
+import fs, { readdirSync } from "node:fs";
 import { ClientManifestPlugin } from "./plugins/client-mainfest-plugin.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const clientComponents = {};
+
+function findClientComponents(dir) {
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const stats = fs.statSync(filePath);
+    if (stats.isFile()) {
+      const content = fs.readFileSync(filePath, "utf-8").trimStart();
+      let firstLine = content.split("\n")[0];
+      firstLine = firstLine.replace(/;$/, "").trim();
+      if (firstLine === '"use client"' || firstLine === "'use client'") {
+        clientComponents[filePath] = filePath;
+      }
+    } else {
+      findClientComponents(filePath);
+    }
+  }
+}
+
+findClientComponents(path.resolve(__dirname, "src"));
 
 const swcRule = {
   test: /\.(?:js|mjs|jsx|ts|tsx)$/,
@@ -36,6 +59,7 @@ const clientConfig = {
   plugins: [new ClientManifestPlugin()],
   entry: {
     main: "./src/entry.client.tsx",
+    ...clientComponents,
   },
   output: {
     path: path.resolve(__dirname, "dist/client"),
