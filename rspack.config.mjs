@@ -4,6 +4,7 @@
 
 import { fileURLToPath } from "node:url";
 import path, { resolve } from "node:path";
+import { ClientManifestPlugin } from "./plugins/client-mainfest-plugin.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,6 +33,7 @@ const clientConfig = {
   name: "client",
   target: "web",
   mode: "development",
+  plugins: [new ClientManifestPlugin()],
   entry: {
     main: "./src/entry.client.tsx",
   },
