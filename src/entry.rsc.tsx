@@ -15,10 +15,17 @@ import { Root } from "./app/Root";
 
 const clientDir = path.resolve(process.cwd(), "dist/client");
 
+const clientManifest = JSON.parse(
+  fs.readFileSync(
+    path.resolve(process.cwd(), "dist/client-manifest.json"),
+    "utf-8",
+  ),
+);
+
 const server = http.createServer((req, res) => {
   if (req.url === "/rsc") {
     res.setHeader("Content-Type", "text/x-component");
-    const { pipe } = renderToPipeableStream(<Root />, {});
+    const { pipe } = renderToPipeableStream(<Root />, clientManifest);
     pipe(res);
     return;
   }

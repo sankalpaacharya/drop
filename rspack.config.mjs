@@ -9,6 +9,7 @@ import { ClientManifestPlugin } from "./plugins/client-mainfest-plugin.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** @type {Record<string, string>} */
 const clientComponents = {};
 
 function findClientComponents(dir) {
@@ -21,7 +22,11 @@ function findClientComponents(dir) {
       let firstLine = content.split("\n")[0];
       firstLine = firstLine.replace(/;$/, "").trim();
       if (firstLine === '"use client"' || firstLine === "'use client'") {
-        clientComponents[filePath] = filePath;
+        const name = path
+          .relative(__dirname, filePath)
+          .split(path.sep)
+          .join("/");
+        clientComponents[name] = filePath;
       }
     } else {
       findClientComponents(filePath);
@@ -30,6 +35,17 @@ function findClientComponents(dir) {
 }
 
 findClientComponents(path.resolve(__dirname, "src"));
+
+// Generate a "barrel" that IMPORTS every client component, so each one becomes a
+// requireable module in __webpack_modules__ (an entry would only EXECUTE them).
+const clientBarrelPath = path.resolve(__dirname, "src/__client_barrel__.js");
+const clientBarrel = Object.entries(clientComponents)
+  .map(
+    ([name, abs], i) =>
+      `import * as m${i} from ${JSON.stringify(abs)};\n(globalThis.__CLIENT_REFS__ ??= {})[${JSON.stringify(name)}] = m${i};`,
+  )
+  .join("\n");
+fs.writeFileSync(clientBarrelPath, clientBarrel);
 
 const swcRule = {
   test: /\.(?:js|mjs|jsx|ts|tsx)$/,
@@ -56,10 +72,9 @@ const clientConfig = {
   name: "client",
   target: "web",
   mode: "development",
-  plugins: [new ClientManifestPlugin()],
+  plugins: [new ClientManifestPlugin(clientComponents)],
   entry: {
-    main: "./src/entry.client.tsx",
-    ...clientComponents,
+    main: ["./src/entry.client.tsx", clientBarrelPath],
   },
   output: {
     path: path.resolve(__dirname, "dist/client"),
