@@ -5,7 +5,7 @@
 import { fileURLToPath } from "node:url";
 import path, { resolve } from "node:path";
 import fs, { readdirSync } from "node:fs";
-import { ClientManifestPlugin } from "./plugins/client-mainfest-plugin.mjs";
+import { ClientManifestPlugin } from "./packages/drop/src/rspack/plugins/client-manifest.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -116,7 +116,7 @@ const serverConfig = {
         test: /\.(ts|tsx|js|jsx)$/,
         exclude: /node_modules/,
         use: [
-          { loader: path.resolve(__dirname, "loaders/use-client-loaders.mjs") },
+          { loader: path.resolve(__dirname, "packages/drop/src/rspack/loaders/use-client.mjs") },
         ],
       },
     ],

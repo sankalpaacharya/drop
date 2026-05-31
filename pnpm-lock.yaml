@@ -46,6 +46,36 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  examples/basic:
+    dependencies:
+      drop:
+        specifier: workspace:*
+        version: link:../../packages/drop
+      react:
+        specifier: ^19.2.6
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.2.6
+        version: 19.2.6(react@19.2.6)
+
+  packages/drop:
+    dependencies:
+      '@rspack/core':
+        specifier: ^1.7.11
+        version: 1.7.11
+      '@swc/core':
+        specifier: ^1.7.0
+        version: 1.15.33
+      react:
+        specifier: ^19.2.0
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.6(react@19.2.6)
+      react-server-dom-webpack:
+        specifier: 19.2.6
+        version: 19.2.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(webpack@5.107.1(@swc/core@1.15.33))
+
 packages:
 
   '@discoveryjs/json-ext@0.5.7':
