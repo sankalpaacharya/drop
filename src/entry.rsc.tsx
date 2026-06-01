@@ -11,7 +11,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { renderToPipeableStream } from "react-server-dom-webpack/server";
-import { Root } from "./app/Root";
+import { Root } from "../examples/basic/src/app/page";
 
 const clientDir = path.resolve(process.cwd(), "dist/client");
 

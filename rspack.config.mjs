@@ -34,11 +34,14 @@ function findClientComponents(dir) {
   }
 }
 
-findClientComponents(path.resolve(__dirname, "src"));
+findClientComponents(path.resolve(__dirname, "examples/basic/src"));
 
 // Generate a "barrel" that IMPORTS every client component, so each one becomes a
 // requireable module in __webpack_modules__ (an entry would only EXECUTE them).
-const clientBarrelPath = path.resolve(__dirname, "src/__client_barrel__.js");
+const clientBarrelPath = path.resolve(
+  __dirname,
+  "examples/basic/src/__client_barrel__.js",
+);
 const clientBarrel = Object.entries(clientComponents)
   .map(
     ([name, abs], i) =>
@@ -116,7 +119,12 @@ const serverConfig = {
         test: /\.(ts|tsx|js|jsx)$/,
         exclude: /node_modules/,
         use: [
-          { loader: path.resolve(__dirname, "packages/drop/src/rspack/loaders/use-client.mjs") },
+          {
+            loader: path.resolve(
+              __dirname,
+              "packages/drop/src/rspack/loaders/use-client.mjs",
+            ),
+          },
         ],
       },
     ],
