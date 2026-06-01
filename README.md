@@ -21,9 +21,7 @@ React Server Components (RSC) actually work — the bundler wiring, the module g
 the client/server boundary, and the flight protocol — without the magic of Next.js
 or Waku hiding the moving parts.
 
-It uses [**Rspack**](https://rspack.dev) as the bundler and React 19's
-`react-server-dom-webpack` runtime. The goal is not to ship a production framework,
-but to demystify every layer of one.
+It uses [**Rspack**](https://rspack.dev) as the bundler.
 
 ## How RSC works here
 
