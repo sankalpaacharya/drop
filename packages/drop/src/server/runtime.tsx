@@ -11,15 +11,15 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { renderToPipeableStream } from "react-server-dom-webpack/server";
-import { Root } from "../examples/basic/src/app/page";
+import { Root } from "../../../../examples/basic/src/app/page";
 
-const clientDir = path.resolve(process.cwd(), "dist/client");
+// Resolve paths relative to this bundled file (dist/server/rsc.cjs),
+// not the cwd — so the server runs correctly no matter where it's invoked from.
+const distDir = path.resolve(__dirname, "..");
+const clientDir = path.join(distDir, "client");
 
 const clientManifest = JSON.parse(
-  fs.readFileSync(
-    path.resolve(process.cwd(), "dist/client-manifest.json"),
-    "utf-8",
-  ),
+  fs.readFileSync(path.join(distDir, "client-manifest.json"), "utf-8"),
 );
 
 const server = http.createServer((req, res) => {
