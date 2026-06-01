@@ -11,7 +11,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { renderToPipeableStream } from "react-server-dom-webpack/server";
-import { Root } from "../../../../examples/basic/src/app/page";
+import Page from "../../../../examples/basic/src/app/page";
 
 // Resolve paths relative to this bundled file (dist/server/rsc.cjs),
 // not the cwd — so the server runs correctly no matter where it's invoked from.
@@ -25,7 +25,7 @@ const clientManifest = JSON.parse(
 const server = http.createServer((req, res) => {
   if (req.url === "/rsc") {
     res.setHeader("Content-Type", "text/x-component");
-    const { pipe } = renderToPipeableStream(<Root />, clientManifest);
+    const { pipe } = renderToPipeableStream(<Page />, clientManifest);
     pipe(res);
     return;
   }

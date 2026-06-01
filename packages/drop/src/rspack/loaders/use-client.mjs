@@ -15,7 +15,30 @@ function collectExports(source) {
   for (const item of ast.body) {
     switch (item.type) {
       case "ExportDeclaration": {
-        names.push(item.declaration.identifier.value);
+        const decl = item.declaration;
+        if (
+          decl.type === "FunctionDeclaration" ||
+          decl.type === "ClassDeclaration"
+        ) {
+          names.push(decl.identifier.value);
+        } else if (decl.type === "VariableDeclaration") {
+          for (const d of decl.declarations) {
+            if (d.id.type === "Identifier") names.push(d.id.value);
+          }
+        }
+        break;
+      }
+      case "ExportNamedDeclaration": {
+        for (const spec of item.specifiers) {
+          if (spec.type === "ExportSpecifier") {
+            names.push((spec.exported ?? spec.orig).value);
+          }
+        }
+        break;
+      }
+      case "ExportDefaultDeclaration":
+      case "ExportDefaultExpression": {
+        names.push("default");
         break;
       }
     }
@@ -33,7 +56,11 @@ export default function useClientLoader(source) {
   let out = `import { registerClientReference } from "react-server-dom-webpack/server";\n`;
 
   for (const name of exports) {
-    out += `export const ${name} = registerClientReference(() => { throw new Error("client only"); }, "${id}", "${name}");\n`;
+    const ref = `registerClientReference(() => { throw new Error("client only"); }, "${id}", "${name}")`;
+    out +=
+      name === "default"
+        ? `export default ${ref};\n`
+        : `export const ${name} = ${ref};\n`;
   }
   return out;
 }
