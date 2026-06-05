@@ -4,7 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev":"drop dev",
+		"dev": "drop dev",
 		"build": "rspack build",
 		"build:client": "rspack build --config-name client",
 		"build:server": "rspack build --config-name server",

@@ -11,7 +11,10 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { renderToPipeableStream } from "react-server-dom-webpack/server";
-import Page from "../../../../examples/basic/src/app/page";
+import { renderToString } from "react-dom/server";
+// `@app/page` is an rspack alias the framework's config builder sets to point at
+// the user's src/app/page.tsx — keeps this runtime app-agnostic.
+import Page from "@app/page";
 
 // Resolve paths relative to this bundled file (dist/server/rsc.cjs),
 // not the cwd — so the server runs correctly no matter where it's invoked from.
@@ -29,6 +32,7 @@ const server = http.createServer((req, res) => {
     pipe(res);
     return;
   }
+
   if (req.url === "/main.js") {
     res.setHeader("Content-Type", "text/javascript");
     fs.createReadStream(path.join(clientDir, "main.js")).pipe(res);

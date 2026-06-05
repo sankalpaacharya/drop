@@ -129,7 +129,13 @@ export function createConfig({ appDir, outDir }) {
         },
       ],
     },
-    resolve: { extensions: [".tsx", ".ts", ".jsx", ".js"] },
+    resolve: {
+      extensions: [".tsx", ".ts", ".jsx", ".js"],
+      // virtual import name → the user's actual root page component.
+      alias: {
+        "@app/page": path.resolve(appDir, "app/page.tsx"),
+      },
+    },
   };
 
   return [clientConfig, serverConfig];
