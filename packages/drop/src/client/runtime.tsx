@@ -1,6 +1,5 @@
 import React, { Suspense, use } from "react";
-import { createRoot } from "react-dom/client";
-import { Root } from "./app/Root";
+import { hydrateRoot } from "react-dom/client";
 import { createFromFetch } from "react-server-dom-webpack/client";
 
 // const container = document.getElementById("root");
@@ -13,7 +12,8 @@ function Shell() {
   return use(flight);
 }
 
-createRoot(document.getElementById("root")!).render(
+hydrateRoot(
+  document.getElementById("root")!,
   <Suspense fallback={<p>loading...</p>}>
     <Shell />
   </Suspense>,

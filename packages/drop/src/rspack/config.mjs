@@ -2,37 +2,40 @@
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import fs from "node:fs";
-import { ClientManifestPlugin } from "./plugins/client-manifest.mjs";
+import {
+  ClientManifestPlugin,
+  ServerConsumerManifestPlugin,
+} from "./plugins/client-manifest.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // drop's OWN runtime + transform files (located relative to THIS config file)
 const CLIENT_RUNTIME = path.resolve(__dirname, "../client/runtime.tsx");
-const SERVER_RUNTIME = path.resolve(__dirname, "../server/runtime.tsx");
 const SSR_ENTRY = path.resolve(__dirname, "../server/ssr.tsx");
+const RSC_RENDERER = path.resolve(__dirname, "../server/rsc-renderer.tsx");
 const USE_CLIENT_LOADER = path.resolve(__dirname, "./loaders/use-client.mjs");
 
 /**
  * Walk `dir` recursively, collect any file whose first non-whitespace line is
  * `"use client"` or `'use client'`. Returns a map of relative-path -> absolute-path.
  * @param {string} dir
- * @param {string} appDir
+ * @param {string} rootDir
  * @param {Record<string, string>} acc
  */
-function findClientComponents(dir, appDir, acc = {}) {
+function findClientComponents(dir, rootDir, acc = {}) {
   for (const entry of fs.readdirSync(dir)) {
     const full = path.join(dir, entry);
     const stat = fs.statSync(full);
     if (stat.isDirectory()) {
-      findClientComponents(full, appDir, acc);
+      findClientComponents(full, rootDir, acc);
       continue;
     }
     if (!/\.(ts|tsx|js|jsx)$/.test(entry)) continue;
     const src = fs.readFileSync(full, "utf-8").trimStart();
     const firstLine = src.split("\n")[0].replace(/;$/, "").trim();
     if (firstLine === '"use client"' || firstLine === "'use client'") {
-      const name = path.relative(appDir, full).split(path.sep).join("/");
-      acc[`src/${name}`] = full; // key matches what the loader stamps as $$id
+      const name = path.relative(rootDir, full).split(path.sep).join("/");
+      acc[name] = full; // key matches what the loader stamps as $$id
     }
   }
   return acc;
@@ -106,25 +109,32 @@ export function createConfig({ appDir, outDir }) {
     target: "node",
     mode: "development",
     entry: {
-      rsc: { import: SERVER_RUNTIME, layer: "react-server" },
-      ssr: { import: SSR_ENTRY, layer: "ssr" },
+      ssr: { import: [SSR_ENTRY, clientBarrelPath], layer: "ssr" },
     },
+    dependencies: ["client"],
     output: {
       path: path.resolve(output, "server"),
       filename: "[name].cjs",
       library: { type: "commonjs2" },
       clean: true,
     },
+    plugins: [new ServerConsumerManifestPlugin(clientComponents)],
     module: {
       rules: [
         swcRule,
         {
+          test: RSC_RENDERER,
+          layer: "react-server",
+        },
+        {
           issuerLayer: "react-server",
+          layer: "react-server",
           resolve: { conditionNames: ["react-server", "..."] },
         },
         {
           test: /\.(ts|tsx|js|jsx)$/,
           exclude: /node_modules/,
+          issuerLayer: "react-server",
           use: [{ loader: USE_CLIENT_LOADER }],
         },
       ],

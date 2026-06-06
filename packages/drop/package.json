@@ -9,9 +9,7 @@
   },
   "exports": {
     ".": "./src/index.mjs",
-    "./rspack-config": "./src/rspack/config.mjs",
-    "./client-runtime": "./src/client/runtime.mjs",
-    "./server-runtime": "./src/server/runtime.mjs"
+    "./rspack-config": "./src/rspack/config.mjs"
   },
   "dependencies": {
     "@rspack/core": "^1.7.11",

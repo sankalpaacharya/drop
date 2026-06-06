@@ -50,8 +50,8 @@ packages/drop/                  the framework itself
 │   └── plugins/
 │       └── client-manifest.mjs emits dist/client-manifest.json (id + chunks)
 ├── src/server/
-│   ├── runtime.tsx             RSC server: renders flight, serves /rsc + HTML shell
-│   └── ssr.tsx                 SSR layer (WIP)
+│   ├── rsc-renderer.tsx        react-server layer: renders the Flight stream
+│   └── ssr.tsx                 app server: serves /, /rsc, and client assets
 └── src/client/
     └── runtime.tsx             browser entry: createFromFetch + hydrate
 
@@ -92,10 +92,10 @@ pnpm run build:client
 pnpm run build:server
 ```
 
-Then run the RSC server and open it in the browser:
+Then run the SSR server and open it in the browser:
 
 ```bash
-node dist/server/rsc.cjs
+node dist/server/ssr.cjs
 # → http://localhost:3000
 ```
 

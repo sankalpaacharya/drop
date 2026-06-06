@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "rspack build && node ../../dist/server/rsc.cjs",
+    "dev": "rspack build && node dist/server/ssr.cjs",
     "build": "rspack build"
   },
   "dependencies": {
