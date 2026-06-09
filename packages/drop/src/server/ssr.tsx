@@ -61,6 +61,7 @@ const server = http.createServer((req, res) => {
   if (url.pathname === "/") {
     const flightStream = new PassThrough();
     const { pipe: pipeFlight } = renderFlight(clientManifest);
+    console.log(serverConsumerManifest);
     const response = createFromNodeStream(flightStream, serverConsumerManifest);
 
     pipeFlight(flightStream);

@@ -48,51 +48,54 @@ export class ServerConsumerManifestPlugin {
   apply(compiler) {
     const clientPaths = new Set(Object.values(this.clientComponents));
 
-    compiler.hooks.afterEmit.tap("ServerConsumerManifestPlugin", (compilation) => {
-      const clientManifestPath = path.resolve(
-        compiler.context,
-        "dist/client-manifest.json",
-      );
-      const clientManifest = JSON.parse(
-        fs.readFileSync(clientManifestPath, "utf-8"),
-      );
-      const moduleMap = {};
+    compiler.hooks.afterEmit.tap(
+      "ServerConsumerManifestPlugin",
+      (compilation) => {
+        const clientManifestPath = path.resolve(
+          compiler.context,
+          "dist/client-manifest.json",
+        );
+        const clientManifest = JSON.parse(
+          fs.readFileSync(clientManifestPath, "utf-8"),
+        );
+        const moduleMap = {};
 
-      for (const module of compilation.modules) {
-        if (!clientPaths.has(module.resource)) continue;
-        if (module.layer === "react-server") continue;
+        for (const module of compilation.modules) {
+          if (!clientPaths.has(module.resource)) continue;
 
-        const key = path
-          .relative(compiler.context, module.resource)
-          .split(path.sep)
-          .join("/");
-        const clientModule = clientManifest[key];
-        if (!clientModule) continue;
+          const key = path
+            .relative(compiler.context, module.resource)
+            .split(path.sep)
+            .join("/");
+          const clientModule = clientManifest[key];
+          if (!clientModule) continue;
 
-        const id = compilation.chunkGraph.getModuleId(module);
-        if (id == null) continue;
+          const id = compilation.chunkGraph.getModuleId(module);
+          if (id == null) continue;
+          if (typeof id === "string" && id.startsWith("(react-server)")) continue;
 
-        moduleMap[clientModule.id] = {
-          "*": {
-            id,
-            chunks: [],
-            name: "*",
-          },
-        };
-      }
+          moduleMap[clientModule.id] = {
+            "*": {
+              id,
+              chunks: [],
+              name: "*",
+            },
+          };
+        }
 
-      fs.writeFileSync(
-        path.resolve(compiler.context, "dist/server-consumer-manifest.json"),
-        JSON.stringify(
-          {
-            moduleMap,
-            serverModuleMap: {},
-            moduleLoading: null,
-          },
-          null,
-          2,
-        ),
-      );
-    });
+        fs.writeFileSync(
+          path.resolve(compiler.context, "dist/server-consumer-manifest.json"),
+          JSON.stringify(
+            {
+              moduleMap,
+              serverModuleMap: {},
+              moduleLoading: null,
+            },
+            null,
+            2,
+          ),
+        );
+      },
+    );
   }
 }

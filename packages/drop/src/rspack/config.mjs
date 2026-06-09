@@ -109,7 +109,7 @@ export function createConfig({ appDir, outDir }) {
     target: "node",
     mode: "development",
     entry: {
-      ssr: { import: [SSR_ENTRY, clientBarrelPath], layer: "ssr" },
+      ssr: { import: [clientBarrelPath, SSR_ENTRY], layer: "ssr" },
     },
     dependencies: ["client"],
     output: {
